@@ -11,7 +11,7 @@ get '/' do
 end
 
 get '/hello' do
-  'Morning @vincent! Time to backup database'
+  respond_message 'Morning @vincent! Time to backup database'
 end
 
 post '/backup' do
