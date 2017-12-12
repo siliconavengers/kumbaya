@@ -10,6 +10,8 @@ post '/backup' do
   # Execute the command
   command = "PGPASSWORD=#{ENV['PG_PASSWORD']} pg_dump -Fc --no-acl --no-owner -h #{ENV['PG_HOST']} -p #{ENV['PG_PORT']} -U #{ENV['PG_USER_NAME']} #{ENV['PG_DATABASE_NAME']} > asiaboxoffice_#{Time.now}.dump"
   exec(command)
+
+  respond_message "Huray! The backup file is generated!"
 end
 
 post '/backup_from_local' do
