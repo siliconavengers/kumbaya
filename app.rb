@@ -10,6 +10,10 @@ get '/' do
   'Kumbaya! The bot is up!'
 end
 
+get '/hello' do
+  'Morning @vincent! Time to backup database'
+end
+
 post '/backup' do
   # Execute the command
   `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME> asiaboxoffice_$(date +%d-%b-%Y).dump`
