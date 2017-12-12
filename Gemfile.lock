@@ -4,6 +4,7 @@ GEM
     dotenv (2.2.1)
     mustermann (1.0.1)
     net-ssh (4.2.0)
+    puma (3.11.0)
     rack (2.0.3)
     rack-protection (2.0.0)
       rack
@@ -20,6 +21,7 @@ PLATFORMS
 DEPENDENCIES
   dotenv
   net-ssh
+  puma
   sinatra
 
 BUNDLED WITH

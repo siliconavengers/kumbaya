@@ -2,6 +2,10 @@ require 'sinatra'
 require 'net/ssh'
 require 'json'
 
+configure {
+  set :server, :puma
+}
+
 get '/' do
   'Kumbaya! The bot is up!'
 end
