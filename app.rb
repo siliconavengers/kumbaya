@@ -10,13 +10,13 @@ get '/' do
   'Kumbaya! The bot is up!'
 end
 
-get '/hello' do
+post '/hello' do
   respond_message 'Morning @vincent! Time to backup database'
 end
 
 post '/backup' do
   # Execute the command
-  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME> asiaboxoffice_$(date +%d-%b-%Y).dump`
+  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/asiaboxoffice_$(date +%d-%b-%Y).dump`
 
   respond_message "Huray! The backup file is generated!"
 end
