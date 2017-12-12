@@ -8,7 +8,7 @@ end
 
 post '/backup' do
   # Execute the command
-  command = "PGPASSWORD=#{ENV['PG_PASSWORD']} pg_dump -Fc --no-acl --no-owner -h #{ENV['PG_HOST']} -U #{ENV['PG_USER_NAME']} #{ENV['PG_DATABASE_NAME']} > asiaboxoffice_#{Time.now}.dump"
+  command = "PGPASSWORD=#{ENV['PG_PASSWORD']} pg_dump -Fc --no-acl --no-owner -h #{ENV['PG_HOST']} -p #{ENV['PG_PORT']} -U #{ENV['PG_USER_NAME']} #{ENV['PG_DATABASE_NAME']} > asiaboxoffice_#{Time.now}.dump"
   exec(command)
 end
 
@@ -32,7 +32,7 @@ post '/backup_from_local' do
       channel.request_pty
 
       # Execute the command
-      command = "PGPASSWORD=#{ENV['PG_PASSWORD']} pg_dump -Fc --no-acl --no-owner -h #{ENV['PG_HOST']} -U #{ENV['PG_USER_NAME']} #{ENV['PG_DATABASE_NAME']} > asiaboxoffice_#{Time.now}.dump"
+      command = "PGPASSWORD=#{ENV['PG_PASSWORD']} pg_dump -Fc --no-acl --no-owner -h #{ENV['PG_HOST']} -p #{ENV['PG_PORT']} -U #{ENV['PG_USER_NAME']} #{ENV['PG_DATABASE_NAME']} > asiaboxoffice_#{Time.now}.dump"
       channel.exec(command)
 
       # Wait for response
