@@ -45,7 +45,12 @@ post '/backup' do
     from    ENV['MAIL_FROM']
     subject 'New backup database file from AsiaboxOffice'
     text_part do
-      body "Yoh! Download the file at here: #{backup_url}. This link only available in 60 minutes. Check this link: https://devcenter.heroku.com/articles/heroku-postgres-import-export#restore-to-local-database to know how to restore to your local database. Enjoy."
+      body "
+        Yoh! Download the file at here: #{backup_url}. This link only available in 60 minutes.
+
+        Check this link: https://devcenter.heroku.com/articles/heroku-postgres-import-export#restore-to-local-database to know how to restore to your local database.
+
+        Enjoy."
     end
   end
 
