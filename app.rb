@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'net/ssh'
 require 'json'
+require 'aws-sdk-s3'
+require 'byebug'
 
 configure {
   set :server, :puma
@@ -17,42 +19,14 @@ end
 post '/backup' do
   # Execute the command
   `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/asiaboxoffice_$(date +%d-%b-%Y).dump`
+  file_name = Dir['backup/*'].last
 
-  respond_message "Huray! The backup file is generated!"
-end
+  s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+  obj = s3.bucket(ENV['AWS_BUCKET']).object(file_name)
+  obj.upload_file("#{file_name}")
+  obj.presigned_url(:get, expires_in: 60 * 60)
 
-post '/backup_from_local' do
-  result = ''
-
-  # Start SSH connection
-  Net::SSH.start(ENV['SSH_HOST_NAME'], ENV['SSH_USER_NAME]'], :password => ENV['SSH_PASSWORD']) do |ssh|
-
-    # Open a channel
-    channel = ssh.open_channel do |channel, success|
-      channel.on_data do |channel, data|
-        if data =~ /^\[sudo\] password for /
-          channel.send_data "#{ENV['SSH_PASSWORD']}\n"
-        else
-          result += data.to_s
-        end
-      end
-
-      # Request a pseudo TTY
-      channel.request_pty
-
-      # Execute the command
-      command = "PGPASSWORD=#{ENV['PG_PASSWORD']} pg_dump -Fc --no-acl --no-owner -h #{ENV['PG_HOST']} -p #{ENV['PG_PORT']} -U #{ENV['PG_USER_NAME']} #{ENV['PG_DATABASE_NAME']} > asiaboxoffice_#{Time.now}.dump"
-      channel.exec(command)
-
-      # Wait for response
-      channel.wait
-    end
-
-    # Wait for opened channel
-    channel.wait
-  end
-
-  respond_message "Huray! The backup file is generated!"
+  respond_message "Huray! The backup file is generated! Check your inbox pls!"
 end
 
 def respond_message message
