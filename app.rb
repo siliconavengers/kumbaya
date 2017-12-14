@@ -3,6 +3,7 @@ require 'net/ssh'
 require 'json'
 require 'aws-sdk-s3'
 require 'mail'
+require 'slack-notifier'
 
 configure {
   set :server, :puma
@@ -12,11 +13,26 @@ get '/' do
   'Kumbaya! The bot is up!'
 end
 
-post '/hello' do
-  respond_message 'Morning @vincent! Time to backup database'
+post '/auto' do
+  backup
+
+  notifier = Slack::Notifier.new ENV['WEBHOOK_URL'] do
+    defaults channel: ENV['SLACK_CHANNEL'],
+              username: ENV['SLACK_USER_NAME']
+  end
+
+  notifier.ping "@channel Wake up! Wake up!. I sent the email with backup url to you guys. Enjoy and good night! :omg:"
+
+  respond_message "Huray! The backup file is generated! Check your inbox pls!"
 end
 
 post '/backup' do
+  backup
+
+  respond_message "Huray! The backup file is generated! Check your inbox pls!"
+end
+
+def backup
   # Execute the command to generate latest backup file
   `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/asiaboxoffice_$(date +%d-%b-%Y-%H-%M-%S).dump`
 
@@ -53,8 +69,6 @@ post '/backup' do
         Enjoy."
     end
   end
-
-  respond_message "Huray! The backup file is generated! Check your inbox pls!"
 end
 
 def respond_message message
