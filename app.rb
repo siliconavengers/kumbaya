@@ -23,13 +23,13 @@ post '/auto' do
 
   notifier.ping "Guys, I sent the email with backup urls to you guys. Enjoy and good night!"
 
-  respond_message "Huray! The backup files is generated! Check your inbox pls!"
+  respond_message "Huray! Two backup files for postgres and redis are generated! Check your inbox pls!"
 end
 
 post '/backup' do
   backup
 
-  respond_message "Huray! The backup files is generated! Check your inbox pls!"
+  respond_message "Huray! Two backup files for postgres and redis are generated! Check your inbox pls!"
 end
 
 def backup
@@ -75,7 +75,9 @@ def backup
       body "
         Yoh!
 
-        Download the postgres file at here: #{postgres_backup_url} - and the redis file at here: #{redis_backup_url}.
+        Download the postgres file: #{postgres_backup_url}.
+
+        And the redis file: #{redis_backup_url}.
 
         These link only available in 60 minutes.
 
