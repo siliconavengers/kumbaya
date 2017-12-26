@@ -3,7 +3,6 @@ require 'net/ssh'
 require 'json'
 require 'aws-sdk-s3'
 require 'mail'
-require 'redis-dump'
 require 'slack-notifier'
 
 configure {
