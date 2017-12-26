@@ -34,7 +34,7 @@ end
 
 def backup
   # Execute the command to generate latest backup file
-  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/asiaboxoffice_$(date +%d-%b-%Y-%H-%M-%S).dump`
+  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/postgres/asiaboxoffice_$(date +%d-%b-%Y-%H-%M-%S).dump`
 
   # Execute the command to generate latest redis database
   `redis-dump -u $REDIS_URL -d $REDIS_DATABASE > backup/redis/$REDIS_BACKUP_FILE_NAME_$(date +%d-%b-%Y-%H-%M-%S).json`
