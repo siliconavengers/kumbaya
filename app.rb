@@ -4,6 +4,7 @@ require 'json'
 require 'aws-sdk-s3'
 require 'mail'
 require 'redis-dump'
+require 'slack-notifier'
 
 configure {
   set :server, :puma
@@ -13,13 +14,28 @@ get '/' do
   'Kumbaya! The bot is up!'
 end
 
-post '/hello' do
-  respond_message 'Morning @vincent! Time to backup database'
+post '/auto' do
+  backup
+
+  notifier = Slack::Notifier.new ENV['WEBHOOK_URL'] do
+    defaults channel: ENV['SLACK_CHANNEL'],
+              username: ENV['SLACK_USER_NAME']
+  end
+
+  notifier.ping "Guys, I sent the email with backup urls to you guys. Enjoy and good night!"
+
+  respond_message "Huray! The backup files is generated! Check your inbox pls!"
 end
 
 post '/backup' do
-  # Execute the command to generate latest postgres database
-  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/postgres/$PG_DATABASE_NAME_$(date +%d-%b-%Y-%H-%M-%S).dump`
+  backup
+
+  respond_message "Huray! The backup files is generated! Check your inbox pls!"
+end
+
+def backup
+  # Execute the command to generate latest backup file
+  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/asiaboxoffice_$(date +%d-%b-%Y-%H-%M-%S).dump`
 
   # Execute the command to generate latest redis database
   `redis-dump -u $REDIS_URL -d $REDIS_DATABASE > backup/redis/$REDIS_BACKUP_FILE_NAME_$(date +%d-%b-%Y-%H-%M-%S).json`
@@ -67,8 +83,6 @@ post '/backup' do
         Enjoy."
     end
   end
-
-  respond_message "Huray! The backup file is generated! Check your inbox pls!"
 end
 
 def respond_message message
