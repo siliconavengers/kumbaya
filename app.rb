@@ -48,12 +48,12 @@ def backup
   # postgres file
   postgres_obj = s3.bucket(ENV['AWS_BUCKET']).object(postgres_file_name)
   postgres_obj.upload_file("#{postgres_file_name}")
-  postgres_backup_url = obj.presigned_url(:get, expires_in: 60 * 60)
+  postgres_backup_url = postgres_obj.presigned_url(:get, expires_in: 60 * 60)
 
   # redis file
   redis_obj = s3.bucket(ENV['AWS_BUCKET']).object(redis_file_name)
   redis_obj.upload_file("#{redis_file_name}")
-  redis_backup_url = obj.presigned_url(:get, expires_in: 60 * 60)
+  redis_backup_url = redis_obj.presigned_url(:get, expires_in: 60 * 60)
 
   # Sending email - Use DirectMail server of Alicloud for now
   Mail.defaults do
