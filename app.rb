@@ -22,8 +22,6 @@ post '/auto' do
   end
 
   notifier.ping "Guys, I sent the email with backup url. Enjoy and good night!"
-
-  respond_message "Huray! Two backup files for postgres and redis are generated! Check your inbox pls!"
 end
 
 post '/backup' do
@@ -93,7 +91,3 @@ def backup
   end
 end
 
-def respond_message message
-  content_type :json
-  {:text => message}.to_json
-end
