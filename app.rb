@@ -4,10 +4,10 @@ require 'json'
 require 'aws-sdk-s3'
 require 'mail'
 require 'slack-notifier'
+require 'zip'
 
 configure {
-  set :server, :puma
-}
+  set :server, :puma }
 
 get '/' do
   'Kumbaya! The bot is up!'
@@ -21,7 +21,7 @@ post '/auto' do
               username: ENV['SLACK_USER_NAME']
   end
 
-  notifier.ping "Guys, I sent the email with backup urls to you guys. Enjoy and good night!"
+  notifier.ping "Guys, I sent the email with backup url. Enjoy and good night!"
 
   respond_message "Huray! Two backup files for postgres and redis are generated! Check your inbox pls!"
 end
@@ -29,31 +29,38 @@ end
 post '/backup' do
   backup
 
-  respond_message "Huray! Two backup files for postgres and redis are generated! Check your inbox pls!"
+  notifier = Slack::Notifier.new ENV['WEBHOOK_URL'] do
+    defaults channel: ENV['SLACK_CHANNEL'],
+              username: ENV['SLACK_USER_NAME']
+  end
+
+  notifier.ping "Yoh! I sent the backup files. Check your email pls!"
 end
 
 def backup
   # Execute the command to generate latest backup file
-  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/postgres/asiaboxoffice_$(date +%d-%b-%Y-%H-%M-%S).dump`
+  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/postgres/postgres_$(date +%d-%b-%Y-%H-%M-%S).dump`
 
   # Execute the command to generate latest redis database
-  `redis-dump -u $REDIS_URL -d $REDIS_DATABASE > backup/redis/$REDIS_BACKUP_FILE_NAME_$(date +%d-%b-%Y-%H-%M-%S).json`
+  `redis-dump -u $REDIS_URL -d $REDIS_DATABASE > backup/redis/redis_$(date +%d-%b-%Y-%H-%M-%S).json`
 
-  # Upload backup files to AWS S3
-  postgres_file_name = Dir['backup/postgres/*'].last
-  redis_file_name = Dir['backup/redis/*'].last
+  # Zip backup files
+  postgres_file_path = Dir['backup/postgres/*'].sort_by{ |f| File.mtime(f) }.last
+  redis_file_path = Dir['backup/redis/*'].sort_by{ |f| File.mtime(f) }.last
 
+  zip_file_path = "/backup/data-backup-#{Time.now}.zip"
+
+  Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+    zipfile.add(postgres_file_path.split("/").last, postgres_file_path)
+    zipfile.add(redis_file_path.split("/").last, redis_file_path)
+  end
+
+  # Upload zip file to S3
   s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
 
-  # postgres file
-  postgres_obj = s3.bucket(ENV['AWS_BUCKET']).object(postgres_file_name)
-  postgres_obj.upload_file("#{postgres_file_name}")
-  postgres_backup_url = postgres_obj.presigned_url(:get, expires_in: 60 * 60)
-
-  # redis file
-  redis_obj = s3.bucket(ENV['AWS_BUCKET']).object(redis_file_name)
-  redis_obj.upload_file("#{redis_file_name}")
-  redis_backup_url = redis_obj.presigned_url(:get, expires_in: 60 * 60)
+  zip_obj = s3.bucket(ENV['AWS_BUCKET']).object(zip_file_path)
+  zip_obj.upload_file("#{zip_file_path}")
+  zip_backup_url = zip_obj.presigned_url(:get, expires_in: 60 * 60)
 
   # Sending email - Use DirectMail server of Alicloud for now
   Mail.defaults do
@@ -75,11 +82,9 @@ def backup
       body "
         Yoh!
 
-        Download the postgres file: #{postgres_backup_url}.
+        Download the backup file at here: #{zip_backup_url}.
 
-        And the redis file: #{redis_backup_url}.
-
-        These link only available in 60 minutes.
+        This link only available in 60 minutes.
 
         Enjoy."
     end
