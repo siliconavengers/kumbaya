@@ -48,7 +48,9 @@ def backup
   postgres_file_path = Dir['backup/postgres/*'].sort_by{ |f| File.mtime(f) }.last
   redis_file_path = Dir['backup/redis/*'].sort_by{ |f| File.mtime(f) }.last
 
-  zip_file_path = "backup/data-backup-#{Time.now}.zip"
+  now = Time.now
+
+  zip_file_path = "backup/data-backup-#{now}.zip"
 
   Zip::File.open(zip_file_path, Zip::File::CREATE) do |zipfile|
     zipfile.add(postgres_file_path.split("/").last, postgres_file_path)
@@ -77,7 +79,7 @@ def backup
   mail = Mail.deliver do
     to      ENV['MAIL_TO']
     from    ENV['MAIL_FROM']
-    subject 'New backup database file from AsiaboxOffice'
+    subject "New backup database file for AsiaBoxOffice at #{now}"
     text_part do
       body "
         Yoh!
