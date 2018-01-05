@@ -50,7 +50,7 @@ def backup
 
   zip_file_path = "/backup/data-backup-#{Time.now}.zip"
 
-  Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+  Zip::File.open(zip_file_path, Zip::File::CREATE) do |zipfile|
     zipfile.add(postgres_file_path.split("/").last, postgres_file_path)
     zipfile.add(redis_file_path.split("/").last, redis_file_path)
   end
