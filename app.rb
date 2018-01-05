@@ -48,7 +48,7 @@ def backup
   postgres_file_path = Dir['backup/postgres/*'].sort_by{ |f| File.mtime(f) }.last
   redis_file_path = Dir['backup/redis/*'].sort_by{ |f| File.mtime(f) }.last
 
-  zip_file_path = "/backup/data-backup-#{Time.now}.zip"
+  zip_file_path = "backup/data-backup-#{Time.now}.zip"
 
   Zip::File.open(zip_file_path, Zip::File::CREATE) do |zipfile|
     zipfile.add(postgres_file_path.split("/").last, postgres_file_path)
