@@ -29,6 +29,7 @@ post '/auto' do
 end
 
 post '/auto-hour' do
+  now = Time.now
   backup(now)
 end
 
