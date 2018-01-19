@@ -42,7 +42,7 @@ post '/backup' do
               username: ENV['SLACK_USER_NAME']
   end
 
-  notifier.ping "Done! The backup file for #{now} is here: #{bitly_link}"
+  notifier.ping "The backup database at #{now} is here: #{bitly_link}"
 end
 
 def backup(now)
