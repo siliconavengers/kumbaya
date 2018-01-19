@@ -28,6 +28,10 @@ post '/auto' do
   notifier.ping "Morning! I sent an email with backup database. Thanks! Have a nice day!"
 end
 
+post '/auto-hour' do
+  backup(now)
+end
+
 post '/backup' do
   now = Time.now
 
