@@ -29,12 +29,12 @@ post '/auto' do
 end
 
 post '/hourly-run' do
-  now = Time.now
+  now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
   backup(now)
 end
 
 post '/run-backup' do
-  now = Time.now
+  now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
   send_to_slack(now)
 end
 
