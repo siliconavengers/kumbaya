@@ -67,11 +67,16 @@ def backup(now)
     zipfile.add(redis_file_path.split("/").last, redis_file_path)
   end
 
+  # GPG encrypt the zip file
+  `gpg --encrypt --recipient $YOUR_RECIPIENT #{zip_file_path}`
+
+  new_zip_file_path = zip_file_path + ".gpg"
+
   # Upload zip file to S3
   s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
 
-  zip_obj = s3.bucket(ENV['AWS_BUCKET']).object(zip_file_path)
-  zip_obj.upload_file("#{zip_file_path}")
+  zip_obj = s3.bucket(ENV['AWS_BUCKET']).object(new_zip_file_path)
+  zip_obj.upload_file("#{new_zip_file_path}")
   zip_obj.presigned_url(:get, expires_in: 60 * 60)
 end
 
