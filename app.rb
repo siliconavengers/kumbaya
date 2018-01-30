@@ -14,7 +14,7 @@ get '/' do
 end
 
 post '/auto' do
-  now = Time.now
+  now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
 
   zip_backup_url = backup(now)
 
@@ -25,7 +25,7 @@ post '/auto' do
               username: ENV['SLACK_USER_NAME']
   end
 
-  notifier.ping "Morning! I sent an email with backup database. Thanks! Have a nice day!"
+  notifier.ping "Good morning! Have a nice day!"
 end
 
 post '/hourly-run' do
