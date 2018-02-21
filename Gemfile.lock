@@ -34,7 +34,7 @@ GEM
     multi_json (1.13.1)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
-    mustermann (1.0.1)
+    mustermann (1.0.2)
     net-ssh (4.2.0)
     oauth2 (1.4.0)
       faraday (>= 0.8, < 0.13)
@@ -44,7 +44,7 @@ GEM
       rack (>= 1.2, < 3)
     puma (3.11.0)
     rack (2.0.3)
-    rack-protection (2.0.0)
+    rack-protection (2.0.1)
       rack
     redis (4.0.1)
     redis-dump (0.4.0)
@@ -53,10 +53,10 @@ GEM
       uri-redis (>= 0.4.0)
       yajl-ruby (>= 0.1)
     rubyzip (1.2.1)
-    sinatra (2.0.0)
+    sinatra (2.0.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
-      rack-protection (= 2.0.0)
+      rack-protection (= 2.0.1)
       tilt (~> 2.0)
     slack-notifier (2.3.1)
     tilt (2.0.8)
@@ -75,7 +75,7 @@ DEPENDENCIES
   puma
   redis-dump
   rubyzip
-  sinatra
+  sinatra (= 2.0.1)
   slack-notifier
 
 BUNDLED WITH
