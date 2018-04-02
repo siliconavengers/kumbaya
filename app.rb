@@ -16,7 +16,7 @@ end
 post '/auto' do
   now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
 
-  zip_backup_url = backup(now)
+  zip_backup_url = new_backup(now, ENV['PG_PASSWORD'], ENV['PG_HOST'], ENV['PG_PORT'], ENV['PG_DATABASE_NAME'], ENV['PG_USER_NAME'], ENV['REDIS_URL'], ENV['REDIS_DATABASE'], ENV['APP_1'])
 
   send_mail(zip_backup_url, now)
 
@@ -30,12 +30,23 @@ end
 
 post '/hourly-run' do
   now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
-  backup(now)
+  if params[:app] == ENV["APP_1"]
+    new_backup(now, ENV['PG_PASSWORD'], ENV['PG_HOST'], ENV['PG_PORT'], ENV['PG_DATABASE_NAME'], ENV['PG_USER_NAME'], ENV['REDIS_URL'], ENV['REDIS_DATABASE'], ENV['APP_1'])
+  elsif params[:app] == ENV["APP_2"]
+    new_backup(now, ENV['PG_PASSWORD_2'], ENV['PG_HOST_2'], ENV['PG_PORT_2'], ENV['PG_DATABASE_NAME_2'], ENV['PG_USER_NAME_2'], ENV['REDIS_URL_2'], ENV['REDIS_DATABASE_2'], ENV['APP_2'])
+  end
 end
 
-post '/run-backup' do
+post '/run-backup-booking' do
   now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
-  send_to_slack(now)
+  backup_url = new_backup(now, ENV['PG_PASSWORD'], ENV['PG_HOST'], ENV['PG_PORT'], ENV['PG_DATABASE_NAME'], ENV['PG_USER_NAME'], ENV['REDIS_URL'], ENV['REDIS_DATABASE'], ENV['APP_1'])
+  send_to_slack(now, backup_url)
+end
+
+post '/run-backup-ems' do
+  now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
+  backup_url = new_backup(now, ENV['PG_PASSWORD_2'], ENV['PG_HOST_2'], ENV['PG_PORT_2'], ENV['PG_DATABASE_NAME_2'], ENV['PG_USER_NAME_2'], ENV['REDIS_URL_2'], ENV['REDIS_DATABASE_2'], ENV['APP_2'])
+  send_to_slack(now, backup_url)
 end
 
 post '/new-backup' do
@@ -48,8 +59,8 @@ post '/new-backup' do
   'DONE'
 end
 
-def send_to_slack(now)
-  bitly_link = generate_short_link(backup(now))
+def send_to_slack(now, backup_url)
+  bitly_link = generate_short_link(backup_url)
 
   notifier = Slack::Notifier.new ENV['WEBHOOK_URL'] do
     defaults channel: ENV['SLACK_CHANNEL'],
