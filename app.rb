@@ -40,13 +40,13 @@ end
 post '/run-backup-booking' do
   now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
   backup_url = new_backup(now, ENV['PG_PASSWORD'], ENV['PG_HOST'], ENV['PG_PORT'], ENV['PG_DATABASE_NAME'], ENV['PG_USER_NAME'], ENV['REDIS_URL'], ENV['REDIS_DATABASE'], ENV['APP_1'])
-  send_to_slack(now, backup_url)
+  send_to_slack(now, backup_url, ENV['APP_1'])
 end
 
 post '/run-backup-ems' do
   now = Time.now.strftime("%d-%b-%Y-%H-%M-%S-%z")
   backup_url = new_backup(now, ENV['PG_PASSWORD_2'], ENV['PG_HOST_2'], ENV['PG_PORT_2'], ENV['PG_DATABASE_NAME_2'], ENV['PG_USER_NAME_2'], ENV['REDIS_URL_2'], ENV['REDIS_DATABASE_2'], ENV['APP_2'])
-  send_to_slack(now, backup_url)
+  send_to_slack(now, backup_url, ENV['APP_2'])
 end
 
 post '/new-backup' do
@@ -59,7 +59,7 @@ post '/new-backup' do
   'DONE'
 end
 
-def send_to_slack(now, backup_url)
+def send_to_slack(now, backup_url, project_name)
   bitly_link = generate_short_link(backup_url)
 
   notifier = Slack::Notifier.new ENV['WEBHOOK_URL'] do
@@ -67,7 +67,7 @@ def send_to_slack(now, backup_url)
               username: ENV['SLACK_USER_NAME']
   end
 
-  notifier.ping "The backup database at #{now} is here: #{bitly_link}"
+  notifier.ping "The backup database for #{project_name} at #{now} is here: #{bitly_link}"
 end
 
 def new_backup(now, pg_password, pg_host, pg_port, pg_database_name, pg_user_name, redis_url, redis_database, project_name)
