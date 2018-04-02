@@ -101,37 +101,6 @@ def new_backup(now, pg_password, pg_host, pg_port, pg_database_name, pg_user_nam
   zip_obj.presigned_url(:get, expires_in: 60 * 60)
 end
 
-def backup(now)
-  # Execute the command to generate latest backup file
-  `PGPASSWORD=$PG_PASSWORD pg_dump -Fc --no-acl --no-owner -h $PG_HOST -p $PG_PORT -U $PG_USER_NAME $PG_DATABASE_NAME > backup/postgres/postgres_$(date +%d-%b-%Y-%H-%M-%S).dump`
-
-  # Execute the command to generate latest redis database
-  `redis-dump -u $REDIS_URL -d $REDIS_DATABASE > backup/redis/redis_$(date +%d-%b-%Y-%H-%M-%S).json`
-
-  # Zip backup files
-  postgres_file_path = Dir['backup/postgres/*'].sort_by{ |f| File.mtime(f) }.last
-  redis_file_path = Dir['backup/redis/*'].sort_by{ |f| File.mtime(f) }.last
-
-  zip_file_path = "backup/data-backup-#{now}.zip"
-
-  Zip::File.open(zip_file_path, Zip::File::CREATE) do |zipfile|
-    zipfile.add(postgres_file_path.split("/").last, postgres_file_path)
-    zipfile.add(redis_file_path.split("/").last, redis_file_path)
-  end
-
-  # GPG encrypt the zip file
-  `gpg --encrypt --recipient $YOUR_RECIPIENT #{zip_file_path}`
-
-  new_zip_file_path = zip_file_path + ".gpg"
-
-  # Upload zip file to S3
-  s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
-
-  zip_obj = s3.bucket(ENV['AWS_BUCKET']).object(new_zip_file_path)
-  zip_obj.upload_file("#{new_zip_file_path}")
-  zip_obj.presigned_url(:get, expires_in: 60 * 60)
-end
-
 def send_mail(zip_backup_url, now)
   # Sending email - Use DirectMail server of Alicloud for now
   Mail.defaults do
