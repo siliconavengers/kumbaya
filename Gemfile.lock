@@ -52,7 +52,7 @@ GEM
       redis (>= 4.0)
       uri-redis (>= 0.4.0)
       yajl-ruby (>= 0.1)
-    rubyzip (1.2.1)
+    rubyzip (2.0.0)
     sinatra (2.0.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -74,9 +74,9 @@ DEPENDENCIES
   net-ssh
   puma
   redis-dump
-  rubyzip
+  rubyzip (>= 1.3.0)
   sinatra (= 2.0.1)
   slack-notifier
 
 BUNDLED WITH
-   1.16.0.pre.2
+   1.17.3
