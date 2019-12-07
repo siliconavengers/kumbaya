@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'puma'
+gem 'puma', '>= 3.12.2'
 gem 'sinatra', "2.0.1"
 gem 'net-ssh'
 gem 'dotenv'
