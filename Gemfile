@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'puma'
-gem 'sinatra', "2.0.1"
+gem 'sinatra', '2.2.3'
 gem 'net-ssh'
 gem 'dotenv'
 gem 'aws-sdk-s3'
