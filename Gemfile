@@ -1,12 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'puma'
-gem 'sinatra', "2.0.1"
+gem 'puma', '>= 4.3.12'
+gem 'sinatra', '2.2.3'
 gem 'net-ssh'
 gem 'dotenv'
 gem 'aws-sdk-s3'
 gem 'mail'
 gem 'redis-dump'
 gem 'slack-notifier'
-gem 'rubyzip'
+gem 'rubyzip', '>= 1.3.0'
 gem 'bitly'
