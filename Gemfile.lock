@@ -19,7 +19,6 @@ GEM
       multi_json (~> 1.3)
       oauth2 (>= 0.5.0, < 2.0)
     dotenv (2.2.1)
-    drydock (0.6.9)
     faraday (0.12.2)
       multipart-post (>= 1.2, < 3)
     httparty (0.15.6)
@@ -46,12 +45,7 @@ GEM
     rack (2.0.3)
     rack-protection (2.0.1)
       rack
-    redis (4.0.1)
-    redis-dump (0.4.0)
-      drydock (>= 0.6.9)
-      redis (>= 4.0)
-      uri-redis (>= 0.4.0)
-      yajl-ruby (>= 0.1)
+    redis-dump (0.6.0)
     rubyzip (1.2.1)
     sinatra (2.0.1)
       mustermann (~> 1.0)
@@ -60,8 +54,6 @@ GEM
       tilt (~> 2.0)
     slack-notifier (2.3.1)
     tilt (2.0.8)
-    uri-redis (0.4.2)
-    yajl-ruby (1.3.1)
 
 PLATFORMS
   ruby
@@ -73,10 +65,10 @@ DEPENDENCIES
   mail
   net-ssh
   puma
-  redis-dump
+  redis-dump (>= 0.6.0)
   rubyzip
   sinatra (= 2.0.1)
   slack-notifier
 
 BUNDLED WITH
-   1.16.0.pre.2
+   1.17.3
